@@ -1,2 +1,10 @@
 **
-!kubezonnet-server
+!go.mod
+!go.sum
+!byteorder/
+!byteorder/**
+!payload/
+!payload/**
+!cmd/
+!cmd/server/
+!cmd/server/**

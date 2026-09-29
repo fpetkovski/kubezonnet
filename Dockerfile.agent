@@ -1,4 +1,28 @@
+# syntax=docker/dockerfile:1
+
+FROM --platform=$BUILDPLATFORM golang:1.23.2-bookworm AS builder
+WORKDIR /src
+
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends clang llvm \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY agent ./agent
+COPY byteorder ./byteorder
+COPY payload ./payload
+COPY cmd/agent ./cmd/agent
+
+RUN cd agent && go generate
+
+ARG TARGETOS
+ARG TARGETARCH
+RUN CGO_ENABLED=0 GOOS=$TARGETOS GOARCH=$TARGETARCH \
+    go build -trimpath -ldflags="-s -w" -o /out/kubezonnet-agent ./cmd/agent
+
 FROM cgr.dev/chainguard/static
 USER root
-ADD kubezonnet-agent /kubezonnet-agent
+COPY --from=builder /out/kubezonnet-agent /kubezonnet-agent
 ENTRYPOINT ["/kubezonnet-agent"]

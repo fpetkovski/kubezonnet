@@ -1,2 +1,12 @@
 **
-!kubezonnet-agent
+!go.mod
+!go.sum
+!agent/
+!agent/**
+!byteorder/
+!byteorder/**
+!payload/
+!payload/**
+!cmd/
+!cmd/agent/
+!cmd/agent/**
